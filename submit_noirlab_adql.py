@@ -4,9 +4,15 @@ import os
 import webbrowser
 import pyperclip
 import sys
-import tty
-import termios
+import platform
 from datetime import datetime
+
+# Platform-specific imports
+if platform.system() != "Windows":
+    import tty
+    import termios
+else:
+    import msvcrt
 
 # Config parameters
 PREVIEW_LIMIT = 10
@@ -14,33 +20,47 @@ STORAGE_LIMIT = 10000000
 CSV_OUTPUT_PREFIX = "cool-lamps-fullsky/"  # Edit this to add a prefix to your CSV filenames (we will use "cool-lamps-fullsky/")
 
 def wait_for_key(prompt, valid_keys):
-    """Wait for a specific keypress (e.g. ' ' for space, '\r' for enter)."""
+    """Wait for a specific keypress (e.g. ' ' for space, '\r' for enter). Cross-platform."""
     print(prompt, end='', flush=True)
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-
-    try:
-        tty.setraw(fd)
-        buffer = ''
+    
+    if platform.system() == "Windows":
+        # Windows implementation using msvcrt
         while True:
-            ch = sys.stdin.read(1)
+            ch = msvcrt.getch().decode('utf-8', errors='ignore')
             if ch == '\x03':  # Ctrl+C
                 raise KeyboardInterrupt
-            if ch in valid_keys:
-                print('\r')  # Carriage return to reset cursor position
-                return ch
-            buffer += ch
-            # If user types full word like "quit"
-            if buffer.lower() in ['q', 'quit']:
+            if ch.lower() == 'q':
                 print("\n[QUIT] Quit by user request.")
                 sys.exit(0)
-            # Reset if the buffer gets too long or if there's a newline
-            if len(buffer) > 5 or ch in ['\r', '\n']:
-                print(f"\n[ERROR] Invalid input. Press only {repr(valid_keys)} or 'q' to quit.")
-                print(prompt, end='', flush=True)
-                buffer = ''
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            if ch in valid_keys or (ch == '\r' and '\r' in valid_keys):
+                print()  # New line after keypress
+                return ch
+    else:
+        # Unix/macOS implementation using termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            buffer = ''
+            while True:
+                ch = sys.stdin.read(1)
+                if ch == '\x03':  # Ctrl+C
+                    raise KeyboardInterrupt
+                if ch in valid_keys:
+                    print('\r')  # Carriage return to reset cursor position
+                    return ch
+                buffer += ch
+                # If user types full word like "quit"
+                if buffer.lower() in ['q', 'quit']:
+                    print("\n[QUIT] Quit by user request.")
+                    sys.exit(0)
+                # Reset if the buffer gets too long or if there's a newline
+                if len(buffer) > 5 or ch in ['\r', '\n']:
+                    print(f"\n[ERROR] Invalid input. Press only {repr(valid_keys)} or 'q' to quit.")
+                    print(prompt, end='', flush=True)
+                    buffer = ''
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 def paste_next_query_and_log(directory="adql_queries", log_file="query_log.txt"):
     files = sorted(f for f in os.listdir(directory) if f.endswith(".adql") and not f.startswith("DONE_"))
