@@ -60,7 +60,9 @@ def download_all_results(vos_dir, local_dir, log_file=None):
     else:
         # List all .csv files in VOS directory
         print("[INFO] Listing all files in VOS directory...")
-        files = storeClient.ls(vos_path)
+        files_str = storeClient.ls(vos_path)
+        # storeClient.ls() returns comma-separated string, not a list
+        files = [f.strip() for f in files_str.split(',') if f.strip()]
         csv_files = [f for f in files if f.endswith(".csv")]
         
         if not csv_files:
