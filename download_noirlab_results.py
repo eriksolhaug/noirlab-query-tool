@@ -4,6 +4,8 @@ from getpass import getpass
 from dl import authClient, storeClient
 import argparse
 import os
+import sys
+from io import StringIO
 
 def download_all_results(vos_dir, local_dir, log_file):
     """
@@ -60,12 +62,20 @@ def download_all_results(vos_dir, local_dir, log_file):
     failed = []
     for i, filename in enumerate(csv_files, 1):
         try:
-            print(f"\n[{i}/{len(csv_files)}] Downloading: {filename}")
+            print(f"[{i}/{len(csv_files)}] Downloading: {filename}", end='', flush=True)
             local_path = os.path.join(local_dir, filename)
-            storeClient.get(fr=f"{vos_path}/{filename}", to=local_path)
-            print(f"[OK] Saved to {local_path}")
+            
+            # Suppress progress output from storeClient.get()
+            old_stdout = sys.stdout
+            sys.stdout = StringIO()
+            try:
+                storeClient.get(fr=f"{vos_path}/{filename}", to=local_path)
+            finally:
+                sys.stdout = old_stdout
+            
+            print(" [OK]")
         except Exception as e:
-            print(f"[ERROR] Failed to download {filename}: {e}")
+            print(f" [ERROR] {e}")
             failed.append(filename)
     
     # Summary
