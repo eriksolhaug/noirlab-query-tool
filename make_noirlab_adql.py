@@ -6,15 +6,15 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 
 # Galactic latitude parameters
-GALACTIC_LAT = None  # Set to "north", "south", or None
+GALACTIC_LAT = "north"  # Set to "north", "south", or None
 MW_DISK_LAT1 = 15.0   # Northern boundary of the Milky Way (degrees) - DO NOT CHANGE
 MW_DISK_LAT2 = -15.0  # Southern boundary of the Milky Way (degrees) - DO NOT CHANGE
 
 # ADQL query parameters
-RA_MIN_BASE = 75
-RA_MAX_BASE = 300
-DEC_START = 32.0
-DEC_END = 85.0
+RA_MIN_BASE = 0
+RA_MAX_BASE = 360
+DEC_START = -90.0
+DEC_END = 90.0
 DEC_STEP = 0.5
 SNR_Z_THRESHOLD = 2.0
 
