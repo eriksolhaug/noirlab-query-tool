@@ -43,7 +43,7 @@ To create ADQL queries for a specific region:
 python make_noirlab_adql.py
 ```
 
-Edit the parameters in `make_noirlab_adql.py` to customize RA/Dec ranges and other settings. Set `GALACTIC_LAT` to "north" for northern galactic latitudes and "south" for southern galactic latitudes. Do not change `MW_DISK_LAT1` or `MW_DISK_LAT2`.
+Edit the parameters in `make_noirlab_adql.py` to customize RA/Dec ranges and other settings. Set `GALACTIC_LAT` to "north" for northern galactic latitudes and "south" for southern galactic latitudes. Do not change `MW_DISK_LAT1` or `MW_DISK_LAT2`. Keep `GALACTIC_LAT` as "None" to not filter for galactic latitudes.
 
 ### 4. Run a Query
 
