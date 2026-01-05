@@ -39,14 +39,15 @@ def icrs_to_galactic_b(ra_deg, dec_deg):
     return icrs.galactic.b.deg
 
 def find_ra_at_dec_crossing(dec_target):
-    """Find RA where a given Galactic latitude crosses a specific declination."""
+    """Find RA values where a given Galactic latitude crosses a specific declination.
+    Returns both left and right crossing points if they exist."""
     l_vals = np.linspace(0.0, 360.0, 10000)
     if GALACTIC_LAT == "north":
         b_vals = np.full_like(l_vals, MW_DISK_LAT1, dtype=float)
     elif GALACTIC_LAT == "south":
         b_vals = np.full_like(l_vals, MW_DISK_LAT2, dtype=float)
     else:
-        return None
+        return None, None
     
     ra_deg_line, dec_deg_line = galactic_to_equatorial(l_vals, b_vals)
     
@@ -62,7 +63,14 @@ def find_ra_at_dec_crossing(dec_target):
                 ra_crossing = ra_deg_line[i] + t * (ra_deg_line[i+1] - ra_deg_line[i])
                 crossings.append(ra_crossing % 360.0)
     
-    return min(crossings) if crossings else None
+    if len(crossings) >= 2:
+        # Return both boundaries
+        return sorted(crossings)[0], sorted(crossings)[1]
+    elif len(crossings) == 1:
+        # Only one crossing found
+        return crossings[0], None
+    else:
+        return None, None
 
 def generate_adql_scripts(output_dir="adql_queries"):
     # Base RA range
@@ -78,12 +86,21 @@ def generate_adql_scripts(output_dir="adql_queries"):
         # Adjust RA limits based on galactic latitude if specified
         ra_min, ra_max = ra_min_base, ra_max_base
         if GALACTIC_LAT is not None:
-            ra_boundary = find_ra_at_dec_crossing(dec_min)
-            if ra_boundary is not None:
+            ra_boundary_left, ra_boundary_right = find_ra_at_dec_crossing(dec_min)
+            if ra_boundary_left is not None:
                 if GALACTIC_LAT == "north":
-                    ra_min = max(ra_min_base, ra_boundary)
+                    # Keep RA values between the two boundaries (north of the plane)
+                    ra_min = max(ra_min_base, ra_boundary_left)
+                    if ra_boundary_right is not None:
+                        ra_max = min(ra_max_base, ra_boundary_right)
                 elif GALACTIC_LAT == "south":
-                    ra_max = min(ra_max_base, ra_boundary)
+                    # Keep RA values outside the boundaries (south of the plane)
+                    if ra_boundary_right is not None:
+                        # We want RA < left_boundary OR RA > right_boundary
+                        # For simplicity, constrain to the region less than left boundary
+                        ra_max = min(ra_max_base, ra_boundary_left)
+                    else:
+                        ra_min = max(ra_min_base, ra_boundary_left)
         
         query = ADQL_TEMPLATE.format(
             ra_min=ra_min,
