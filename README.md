@@ -73,14 +73,14 @@ python download_noirlab_results.py
 
 This script will:
 - Prompt you to authenticate with your NOIRLab credentials
-- Read `query_log.txt` to find completed queries
-- Download all corresponding CSV files from NOIRLab's Virtual Object Store
+- List all CSV files in the VOS directory
+- Download all CSV files from NOIRLab's Virtual Object Store
 - Save results to the current directory (or specify `--local_dir`)
 
 Optional arguments:
 - `--vos_dir` - Remote VOS directory (default: `cool-lamps-fullsky`)
 - `--local_dir` - Local directory to save files (default: current directory)
-- `--log_file` - Query log file to read (default: `query_log.txt`)
+- `--log_file` - Query log file to read (optional; if provided, downloads only files listed in the log)
 
 NOTE for COOL-LAMPS: Please ssh into lipwig (see below), and run the above command from inside the /usbdata/cool-lamps-fullsky/ directory. This will be where we download and store all the queried data from NOIRLab Data Lab. You do not need to specify any flags (those with "--" in front of them) as I have made the defaults right for our purpose. You will need to download the data from NOIRLab directly to lipwig (this is required since the data files can be many and quite big!) please use a conda environment on lipwig and make sure to also download the code to your home directory on lipwig. The conda executable on lipwig is located in /opt/anaconda3/bin/conda. Please follow the below workflow to download to lipwig. I have created the noirlab_env on lipwig, so you should be able to activate it.
 
