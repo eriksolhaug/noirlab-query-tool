@@ -1,14 +1,24 @@
 # make_noirlab_adql.py
 
 import os
+import numpy as np
+from astropy.coordinates import SkyCoord
+import astropy.units as u
 
-def generate_adql_scripts(output_dir="adql_queries"):
-    ra_min, ra_max = 75, 300
-    dec_start, dec_end = 32.0, 85.0
-    dec_step = 0.5
-    snr_z_threshold = 2.0
+# Global parameters
+GALACTIC_LAT = None  # Set to "north", "south", or None
+MW_DISK_LAT1 = 15.0   # Northern boundary of the Milky Way (degrees) - DO NOT CHANGE
+MW_DISK_LAT2 = -15.0  # Southern boundary of the Milky Way (degrees) - DO NOT CHANGE
 
-    adql_template = """
+# ADQL query parameters
+RA_MIN_BASE = 75
+RA_MAX_BASE = 300
+DEC_START = 32.0
+DEC_END = 85.0
+DEC_STEP = 0.5
+SNR_Z_THRESHOLD = 2.0
+
+ADQL_TEMPLATE = """
 SELECT ra, dec, dered_mag_g, dered_mag_r, dered_mag_z, type, 
        snr_g, snr_r, snr_z, maskbits, mag_w1, mag_w2, snr_w1, snr_w2
 FROM ls_dr10.tractor
@@ -17,18 +27,70 @@ WHERE ra BETWEEN {ra_min} AND {ra_max}
   AND snr_z > {snr_z}
 """
 
+def galactic_to_equatorial(l_deg, b_deg):
+    """Convert Galactic to Equatorial coordinates."""
+    gal = SkyCoord(l=np.asarray(l_deg) * u.deg, b=np.asarray(b_deg) * u.deg, frame="galactic")
+    eq = gal.icrs
+    return eq.ra.deg, eq.dec.deg
+
+def icrs_to_galactic_b(ra_deg, dec_deg):
+    """Convert Equatorial to Galactic latitude."""
+    icrs = SkyCoord(ra=np.asarray(ra_deg) * u.deg, dec=np.asarray(dec_deg) * u.deg, frame="icrs")
+    return icrs.galactic.b.deg
+
+def find_ra_at_dec_crossing(dec_target):
+    """Find RA where a given Galactic latitude crosses a specific declination."""
+    l_vals = np.linspace(0.0, 360.0, 10000)
+    if GALACTIC_LAT == "north":
+        b_vals = np.full_like(l_vals, MW_DISK_LAT1, dtype=float)
+    elif GALACTIC_LAT == "south":
+        b_vals = np.full_like(l_vals, MW_DISK_LAT2, dtype=float)
+    else:
+        return None
+    
+    ra_deg_line, dec_deg_line = galactic_to_equatorial(l_vals, b_vals)
+    
+    # Find where the line crosses dec_target
+    y = dec_deg_line - dec_target
+    crossings = []
+    for i in range(len(y) - 1):
+        if y[i] * y[i+1] <= 0:  # Sign change indicates crossing
+            if y[i] == y[i+1]:
+                continue
+            t = (-y[i]) / (y[i+1] - y[i])
+            if 0.0 <= t <= 1.0:
+                ra_crossing = ra_deg_line[i] + t * (ra_deg_line[i+1] - ra_deg_line[i])
+                crossings.append(ra_crossing % 360.0)
+    
+    return min(crossings) if crossings else None
+
+def generate_adql_scripts(output_dir="adql_queries"):
+    # Base RA range
+    ra_min_base, ra_max_base = RA_MIN_BASE, RA_MAX_BASE
+
     os.makedirs(output_dir, exist_ok=True)
 
-    dec_min = dec_start
+    dec_min = DEC_START
     count = 0
-    while dec_min < dec_end:
-        dec_max = round(dec_min + dec_step, 1)
-        query = adql_template.format(
+    while dec_min < DEC_END:
+        dec_max = round(dec_min + DEC_STEP, 1)
+        
+        # Adjust RA limits based on galactic latitude if specified
+        ra_min, ra_max = ra_min_base, ra_max_base
+        if GALACTIC_LAT is not None:
+            ra_boundary = find_ra_at_dec_crossing(dec_min)
+            if ra_boundary is not None:
+                if GALACTIC_LAT == "north":
+                    ra_max = min(ra_max_base, ra_boundary)
+                elif GALACTIC_LAT == "south":
+                    ra_min = max(ra_min_base, ra_boundary)
+        
+        query = ADQL_TEMPLATE.format(
             ra_min=ra_min,
             ra_max=ra_max,
             dec_min=dec_min,
             dec_max=dec_max,
-            snr_z=snr_z_threshold
+            snr_z=SNR_Z_THRESHOLD
         )
         filename = f"query_dec_{dec_min:.1f}_to_{dec_max:.1f}.adql"
         filepath = os.path.join(output_dir, filename)
