@@ -81,9 +81,9 @@ def generate_adql_scripts(output_dir="adql_queries"):
             ra_boundary = find_ra_at_dec_crossing(dec_min)
             if ra_boundary is not None:
                 if GALACTIC_LAT == "north":
-                    ra_max = min(ra_max_base, ra_boundary)
-                elif GALACTIC_LAT == "south":
                     ra_min = max(ra_min_base, ra_boundary)
+                elif GALACTIC_LAT == "south":
+                    ra_max = min(ra_max_base, ra_boundary)
         
         query = ADQL_TEMPLATE.format(
             ra_min=ra_min,
