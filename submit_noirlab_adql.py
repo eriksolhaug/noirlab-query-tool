@@ -86,27 +86,17 @@ def paste_next_query_and_log(directory="adql_queries", log_file="query_log.txt")
         # webbrowser.open("https://datalab.noirlab.edu/legacy/query.php")
         webbrowser.open("https://datalab.noirlab.edu/data-explorer")
         print("[INFO] Opened NOIRLab Data Explorer.")
-        print("[HELP] Paste the query manually into the ADQL field (Ctrl+V / Cmd+V).")
-
-        # Copy Preview Limit to clipboard
-        # wait_for_key("[WAIT] Press [space] after you've pasted the query to copy the Preview Limit ({0}): ".format(PREVIEW_LIMIT), valid_keys=[' '])
-        # pyperclip.copy(str(PREVIEW_LIMIT))
-        # print("[CLIPBOARD] Copied Preview Limit: {0}".format(PREVIEW_LIMIT))
+        print("[HELP] Paste the query manually into the ADQL field (Ctrl+V / Cmd+V). Then click 'Execute'.")
 
         # Copy .csv base file name (and directory) to clipboard
-        wait_for_key("[WAIT] Press [space] after you've pasted the Preview Limit to get your .csv base filename: ", valid_keys=[' '])
-        print("[HELP] Click \"Virtual Storage\" to show the \"Result Name\" field.")
+        wait_for_key("[WAIT] Press [space] after you've pasted the query and selected 'Virtual Storage (VOS)' to get your .csv base filename: ", valid_keys=[' '])
+        print("[HELP] Click \"Virtual Storage (VOS)\" in the drop-down to see the \"File Name\" field.")
         print("[INFO] Filename for CSV export: '{0}'".format(base_filename))
         pyperclip.copy(base_filename)
         print("[CLIPBOARD] Copied CSV filename to clipboard.")
 
-        # Copy Storage Limit to clipboard
-        # wait_for_key("[WAIT] Press [space] to copy the Storage Limit ({0:,}): ".format(STORAGE_LIMIT), valid_keys=[' '])
-        # pyperclip.copy(str(STORAGE_LIMIT))
-        # print("[CLIPBOARD] Copied Storage Limit: {0:,}".format(STORAGE_LIMIT))
-
         # Submit the query
-        wait_for_key("[WAIT] Press [Enter] after you've submitted the query (hit 'Process') to submit the query... ", valid_keys=['\r'])
+        wait_for_key("[WAIT] Press [Enter] after you've submitted the query (hit 'Save to VOS') to submit the query... ", valid_keys=['\r'])
         
         # Rename the file to mark as done
         done_path = os.path.join(directory, "DONE_" + next_file)
