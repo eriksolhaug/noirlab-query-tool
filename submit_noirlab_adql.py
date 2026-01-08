@@ -15,8 +15,8 @@ else:
     import msvcrt
 
 # Config parameters
-PREVIEW_LIMIT = 10
-STORAGE_LIMIT = 10000000
+# PREVIEW_LIMIT = 10
+# STORAGE_LIMIT = 10000000
 CSV_OUTPUT_PREFIX = "cool-lamps-fullsky/"  # Edit this to add a prefix to your CSV filenames (we will use "cool-lamps-fullsky/")
 
 def wait_for_key(prompt, valid_keys):
@@ -89,9 +89,9 @@ def paste_next_query_and_log(directory="adql_queries", log_file="query_log.txt")
         print("[HELP] Paste the query manually into the ADQL field (Ctrl+V / Cmd+V).")
 
         # Copy Preview Limit to clipboard
-        wait_for_key("[WAIT] Press [space] after you've pasted the query to copy the Preview Limit ({0}): ".format(PREVIEW_LIMIT), valid_keys=[' '])
-        pyperclip.copy(str(PREVIEW_LIMIT))
-        print("[CLIPBOARD] Copied Preview Limit: {0}".format(PREVIEW_LIMIT))
+        # wait_for_key("[WAIT] Press [space] after you've pasted the query to copy the Preview Limit ({0}): ".format(PREVIEW_LIMIT), valid_keys=[' '])
+        # pyperclip.copy(str(PREVIEW_LIMIT))
+        # print("[CLIPBOARD] Copied Preview Limit: {0}".format(PREVIEW_LIMIT))
 
         # Copy .csv base file name (and directory) to clipboard
         wait_for_key("[WAIT] Press [space] after you've pasted the Preview Limit to get your .csv base filename: ", valid_keys=[' '])
@@ -101,9 +101,9 @@ def paste_next_query_and_log(directory="adql_queries", log_file="query_log.txt")
         print("[CLIPBOARD] Copied CSV filename to clipboard.")
 
         # Copy Storage Limit to clipboard
-        wait_for_key("[WAIT] Press [space] to copy the Storage Limit ({0:,}): ".format(STORAGE_LIMIT), valid_keys=[' '])
-        pyperclip.copy(str(STORAGE_LIMIT))
-        print("[CLIPBOARD] Copied Storage Limit: {0:,}".format(STORAGE_LIMIT))
+        # wait_for_key("[WAIT] Press [space] to copy the Storage Limit ({0:,}): ".format(STORAGE_LIMIT), valid_keys=[' '])
+        # pyperclip.copy(str(STORAGE_LIMIT))
+        # print("[CLIPBOARD] Copied Storage Limit: {0:,}".format(STORAGE_LIMIT))
 
         # Submit the query
         wait_for_key("[WAIT] Press [Enter] after you've submitted the query (hit 'Process') to submit the query... ", valid_keys=['\r'])
