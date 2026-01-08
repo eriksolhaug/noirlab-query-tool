@@ -61,6 +61,16 @@ The script will:
 - Wait for you to paste and submit the query manually
 - Mark the query as done and log it when complete
 
+The general procedure looks like:
+1. Run `python submit_noirlab_adql.py`
+2. Click "Query >" to open the query page
+3. Paste the query into the query field (the tool will have copied it to your clipboard)
+4. Click "Execute"
+5. Select "Virtual Storage (VOS) from the drop-down
+6. Click "Space" in the terminal and paste the csv name into the "File Name" field
+7. Click "Save to VOS" to submit the query. You will then see an overview of the active queries at the bottom of the page
+8. Click "Enter" in the terminal to move on to the next query (it will open a new browser window for each query)
+
 You can type "q" or Ctrl+C any time to quit. The completed queries will be marked as "DONE_" in the adql_queries/ directory. When running submit_noirlab_adql.py, you will start where you left off at the next query without the prefix "DONE_".
 
 NOTE for COOL-LAMPS: The first time you run this code, you will want to make a directory under "VOSpace" by clicking "Create Folder" and name it "cool-lamps-fullsky". Your new directory should appear under VOSpace. This will be where you save the downloaded data files so you can easily identify them among previously stored files in case you've stored files in the NOIRLab browser before.
