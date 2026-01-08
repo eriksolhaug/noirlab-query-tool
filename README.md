@@ -45,6 +45,8 @@ python make_noirlab_adql.py
 
 Edit the parameters in `make_noirlab_adql.py` to customize RA/Dec ranges and other settings. Set `GALACTIC_LAT` to "north" for northern galactic latitudes and "south" for southern galactic latitudes. Do not change `MW_DISK_LAT1` or `MW_DISK_LAT2`. Keep `GALACTIC_LAT` as "None" to not filter for galactic latitudes.
 
+NOTE for COOL-LAMPS: You will edit the parameters under `# ADQL query parameters`. The `RA_MIN_BASE` and `RA_MAX_BASE` should correspond to your RA slice (plus padding 0.5 degree in both directions).
+
 ### 4. Run a Query
 
 Place `.adql` files in the `adql_queries/` directory, then run:
