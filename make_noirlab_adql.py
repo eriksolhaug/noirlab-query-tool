@@ -124,8 +124,7 @@ def generate_adql_scripts(output_dir="adql_queries"):
             ra_min=ra_min,
             ra_max=ra_max,
             dec_min=dec_min,
-            dec_max=dec_max,
-            snr_z=SNR_Z_THRESHOLD
+            dec_max=dec_max
         )
         
         # Generate filename with RA range and galactic latitude if applicable
