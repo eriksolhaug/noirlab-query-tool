@@ -5,7 +5,8 @@ from dl import authClient, storeClient
 import argparse
 import os
 import sys
-from io import StringIO
+import warnings
+from tqdm import tqdm
 
 def download_all_results(vos_dir, local_dir, log_file=None):
     """
@@ -69,39 +70,29 @@ def download_all_results(vos_dir, local_dir, log_file=None):
             print("[WARNING] No CSV files found in VOS directory.")
             return
         print(f"[INFO] Found {len(csv_files)} CSV files in VOS")
-    
-    print(f"[RUN] Downloading {len(csv_files)} files...")
+    print(f"[OK] Preparing to download these files: {csv_files}")
     
     # Create local directory if needed
     os.makedirs(local_dir, exist_ok=True)
     
     # Download each CSV file
     failed = []
-    for i, filename in enumerate(csv_files, 1):
+    print(f"[RUN] Downloading {len(csv_files)} files...")
+    for filename in tqdm(csv_files, desc="Progress", unit="file", ncols=80):
         try:
-            print(f"[{i}/{len(csv_files)}] Downloading: {filename}", end='', flush=True)
             local_path = os.path.join(local_dir, filename)
+            storeClient.get(fr=f"{vos_path}/{filename}", to=local_path)
             
-            # Suppress progress output from storeClient.get()
-            old_stdout = sys.stdout
-            sys.stdout = StringIO()
-            try:
-                storeClient.get(fr=f"{vos_path}/{filename}", to=local_path)
-            finally:
-                sys.stdout = old_stdout
-            
-            print(" [OK]")
         except Exception as e:
-            print(f" [ERROR] {e}")
-            failed.append(filename)
+            failed.append((filename, str(e)))
     
     # Summary
-    print(f"\n[OK] Download complete.")
+    print(f"[OK] Download complete.")
     print(f"[INFO] Successfully downloaded: {len(csv_files) - len(failed)}/{len(csv_files)} files")
     if failed:
         print(f"[WARNING] Failed to download {len(failed)} files:")
-        for f in failed:
-            print(f"  - {f}")
+        for filename, error in failed:
+            print(f"  - {filename}: {error}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
