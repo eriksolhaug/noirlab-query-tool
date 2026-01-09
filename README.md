@@ -98,8 +98,16 @@ NOTE for COOL-LAMPS: Please ssh into lipwig (see below), and run the above comma
 
 ```bash
 source /opt/anaconda3/bin/activate noirlab_env
-cd /usbdata/cool-lamps-fullsky
-python download_noirlab_results.py
+cd /usbdata/cool-lamps-fullsky/ra<start_of_your_RA_slice>-<end_of_your_RA_slice>
+python ../download_noirlab_results.py
+```
+
+For example, since I have the slice RA from 0 to 30 degrees, I run:
+
+```bash
+source /opt/anaconda3/bin/activate noirlab_env
+cd /usbdata/cool-lamps-fullsky/ra0-30
+python ../download_noirlab_results.py
 ```
 
 ### How to ssh into lipwig:
