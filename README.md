@@ -27,7 +27,7 @@ When prompted "Proceed ([y]/n)?" after something like "The following NEW package
 conda activate noirlab_env
 ```
 
-NOTE: Any time you want to run this code, you will first open a terminal, then run the command above to activate the conda environment. This is a common way to avoid package version issues in the future. Once activated, you don't have to activate the environment again unless you close the terminal.
+NOTE: Any time you want to run this code, you will first open a terminal, then run the command above to activate the conda environment. This is a common way to avoid package version issues in the future. Once activated, you don't have to activate the environment again unless you close the terminal or deactivate the conda environment.
 
 Then install the required packages:
 
