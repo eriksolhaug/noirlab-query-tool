@@ -121,7 +121,7 @@ python ../download_noirlab_results.py
 If this doesn't work either, you may also need to install astro-datalab if it does not show up in the conda environment with a `pip list | grep astro-datalab`. Make sure you've activated the noirlab_env conda environment and then run:
 
 ```bash
-pip install astro-datalab
+/opt/anaconda3/bin/pip install astro-datalab
 ```
 
 
